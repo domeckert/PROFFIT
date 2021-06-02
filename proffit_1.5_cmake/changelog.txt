@@ -1,0 +1,18 @@
+Change log for PROFFIT v1.4 (D. Eckert, 16/08/2016).
+
+- PROFFIT has now switched to cmake for automatic configuration. The new cmake version can now be installed on Mac OS X El Capitan. This is the new default way to install PROFFIT, although the older autoconf version is still available. 
+
+- This release introduces the first version of the PROFFIT user guide. The guide is available at the following address:
+
+http://www.isdc.unige.ch/~deckert/proffit_guide.html (HTML version)
+http://www.isdc.unige.ch/~deckert/proffit_guide.pdf (PDF version)
+
+- PROFFIT can now be scripted for automatic execution of the software. Follow the description in Sect. 2.4 of the user guide.
+
+- The new ‘’fakeit’’ command allows to simulate an image according to the current surface-brightness profile. The simulated image can then be analyzed in the same way as a true image.
+
+- The new ‘’density’’ command allows an easy extraction of gas density profile from X-ray data. The use of the routine is described in Sect. 4.7 of the user guide.
+
+- The new ‘’csb’’ command allows one to calculate the surface-brightness concentration parameter, defined as the ratio between the flux integrated within 40 kpc radius to that within 400 kpc radius.
+
+- Numerous bugs and issues have been fixed

@@ -1,0 +1,65 @@
+README file for PROFFIT v1.1, a software for the extraction of X-ray surface-brightness profiles.
+
+If you find this software useful, please don't forget to cite Eckert et al. 2011, A&A 526, 79 in your publications.
+
+********* INSTALL *******************
+
+To install PROFFIT, you must first have a version of the ROOT data analysis framework (>=5.24, see http://root.cern.ch/drupal/content/downloading-root) and of the HEASOFT package (http://heasarc.gsfc.nasa.gov/lheasoft/). Binary distributions are sufficient in both cases. See the PROFFIT user guide for more information:
+
+http://www.isdc.unige.ch/~deckert/proffit_guide.html
+
+To install the software (for C shell variants):
+
+1) Untar the software package and define the PROFFIT directory:
+
+tar xvf proffit_1.1.tar.gz
+cd proffit_1.1/
+setenv PROFFIT $PWD
+
+2) Set the HEASOFT environment:
+
+setenv HEADAS /path/to/HEASOFT/
+source $HEADAS/headas-init.csh
+
+3) Set the ROOT environment:
+
+source /path/to/ROOT/bin/thisroot.csh
+
+4) Run the configure script:
+
+ac_stuff/configure
+
+5) Build the software:
+
+make
+
+
+********** RUN THE SOFTWARE *****************
+
+Once the software is installed, use the following commands to run it:
+
+1) Setup ROOT:
+
+source /path/to/ROOT/bin/thisroot.csh
+
+2) Define the PROFFIT directory and point to libraries:
+
+setenv PROFFIT /path/to/PROFFIT/
+setenv LD_LIBRARY_PATH "$PROFFIT/lib:$LD_LIBRARY_PATH"
+
+3) Run PROFFIT:
+
+$PROFFIT/proffit
+
+Or you can add these lines to your .cshrc file:
+
+source /path/to/ROOT/bin/thisroot.csh
+setenv PROFFIT /path/to/PROFFIT/
+setenv LD_LIBRARY_PATH "$PROFFIT/lib:$LD_LIBRARY_PATH"
+alias proffit "$PROFFIT/proffit"
+
+
+*************  LICENCE ***********************
+
+
+PROFFIT is released under the GNU GPL licence v2.0 (see attached).

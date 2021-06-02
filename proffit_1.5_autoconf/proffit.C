@@ -33,8 +33,6 @@
 #include "fitting.h"
 #include "TLegend.h"
 #include "fakeit.h"
-#include "multinest.h"
-#include "nested_sampling.h"
 #include "voronoi.h"
 
 extern void InitGui();
@@ -66,8 +64,8 @@ do {
   bool issig=false;
   double *backmap=NULL;
   double *cprof=NULL;
-  bool isprofile=false;
   double *profile=NULL;
+  bool isprofile=false;
   double *bins=NULL;
   double *eprof=NULL;
   double *ebins=NULL;
@@ -122,18 +120,13 @@ do {
   bool sector=false;
   bool ellipse=false;
   double *psfmat=NULL;
-    char imgfile[200];
-    char expfile[200];
-    char backfile[200];
   bool isr200=false;
   bool isr500=false;
   bool iskpc=false;
 	bool fitc=false;
-	bool isnested=false;
-	char *nestname=new char[200];
-	bool *islogpar=NULL;
-	double **chains=NULL;
-	int npchain;
+    char imgfile[200];
+    char expfile[200];
+    char backfile[200];
 	double r200obs,r500obs,kpcobs;
 	
   // End initialize variables
@@ -173,31 +166,31 @@ do {
               scripting=true;
           }
       }
-      else if (!strcmp(temp,"readimg")){
-          do {
-              img=NULL;
-              sprintf(comm,"    File name > ");
-              cout << comm;
-              cin >> imgfile;
-              status=getaxes(imgfile,axes);
-              img=new double[axes[0]*axes[1]];
-              status=readimg(imgfile,img,axes,pixsize,cdelt1,crval1,crval2,crpix1,crpix2,wcs_inp);
-              if (status!=0) {
+	  else if (!strcmp(temp,"readimg")){
+		  do {
+			  img=NULL;
+			  sprintf(comm,"    File name > ");
+			  cout << comm;
+			  cin >> imgfile;
+			  status=getaxes(imgfile,axes);
+			  img=new double[axes[0]*axes[1]];
+			  status=readimg(imgfile,img,axes,pixsize,cdelt1,crval1,crval2,crpix1,crpix2,wcs_inp);
+			  if (status!=0) {
                   printf("    Error %d\n",status);
-                  break;
-              }
-              else {
-                  printf("    Image succesfully loaded\n");
-                  isimg=true;
-              }
-              double *cd_inp=new double[4];
-              cd_inp[0]=cdelt1;
-              cd_inp[1]=0.0;
-              cd_inp[2]=0.0;
-              cd_inp[3]=pixsize;
-          }
-          while (0);
-      }
+				  break;
+			  }
+			  else {
+				  printf("    Image succesfully loaded\n");
+				  isimg=true;
+			  }
+			  double *cd_inp=new double[4];
+			  cd_inp[0]=cdelt1;
+			  cd_inp[1]=0.0;
+			  cd_inp[2]=0.0;
+			  cd_inp[3]=pixsize;
+		  }
+		  while (0);
+	  }
       else if (!strcmp(temp,"fakeit")){
           do {
               if (!ismod){
@@ -265,59 +258,59 @@ do {
           }
           while (0);
       }
-      else if (!strcmp(temp,"readexp")){
-          do {
-              exposure=NULL;
-              sprintf(comm,"    File name > ");
-              cout << comm;
-              cin >> expfile;
-              if (!strcmp(expfile,"none")){
-                  exposure=new double[axes[0]*axes[1]];
-                  for (int i=0; i<axes[0]*axes[1]; i++) {
-                      exposure[i]=1.0;
-                  }
-                  isexp=true;
-              }
-              else {
-                  if (!isimg) {
-                      status=getaxes_expo(expfile,axes,pixsize,cdelt1,crval1,crval2,crpix1,crpix2,wcs_inp);
-                      if (status!=0) {
-                          printf("Error: unable to read parameters of exposure map\n");
-                          break;
-                      }
-                  }
-                  exposure=new double[axes[0]*axes[1]];
-                  status=readexp(expfile,axes,exposure);
-                  if (status!=0) {
-                      break;
-                  }
-                  else {
-                      printf("    Exposure map succesfully loaded\n");
-                      isexp=true;
-                  }
-              }
-          }
-          while (0);
-      }
-      else if (!strcmp(temp,"readback")){
-          do {
-              backmap=NULL;
-              sprintf(comm,"    File name > ");
-              cout << comm;
-              cin >> backfile;
-              backmap=new double[axes[0]*axes[1]];
-              status=readback(backfile,axes,backmap);
-              if (status!=0) {
-                  printf("    Error %d\n",status);
-                  break;
-              }
-              else {
-                  printf("    Background map succesfully loaded\n");
-                  isback=true;
-              }
-          }
-          while (0);
-      }
+	  else if (!strcmp(temp,"readexp")){
+			do {
+				exposure=NULL;
+				sprintf(comm,"    File name > ");
+				cout << comm;
+				cin >> expfile;
+				if (!strcmp(temp,"none")){
+					exposure=new double[axes[0]*axes[1]];
+					for (int i=0; i<axes[0]*axes[1]; i++) {
+						exposure[i]=1.0;
+					}
+					isexp=true;
+				}
+				else {
+                    if (!isimg) {
+                        status=getaxes_expo(expfile,axes,pixsize,cdelt1,crval1,crval2,crpix1,crpix2,wcs_inp);
+                        if (status!=0) {
+                            printf("Error: unable to read parameters of exposure map\n");
+                            break;
+                        }
+                    }
+					exposure=new double[axes[0]*axes[1]];
+					status=readexp(expfile,axes,exposure);
+					if (status!=0) {
+						break;
+					}
+					else {
+						printf("    Exposure map succesfully loaded\n");
+						isexp=true;
+					}
+				}
+			}
+			while (0);
+		}
+		else if (!strcmp(temp,"readback")){
+			do {
+				backmap=NULL;
+				sprintf(comm,"    File name > ");
+				cout << comm;
+				cin >> backfile;
+				backmap=new double[axes[0]*axes[1]];
+				status=readback(backfile,axes,backmap);
+				if (status!=0) {
+					printf("    Error %d\n",status);
+					break;
+				}
+				else {
+					printf("    Background map succesfully loaded\n");
+					isback=true;
+				}
+			}
+			while (0);
+		}
 		else if (!strcmp(temp,"model")){
 			cout << "    model (type help for a list) > ";
 			cin >> modname;
@@ -1517,9 +1510,6 @@ do {
              if (!scripting) {
                  theApp.Run(kTRUE);
              }
-             else {
-		     c1->SaveAs("fitcounts.pdf");
-	     }
 			 if (ispsf) {
 				 histpsfmat->Delete();
 			 }
@@ -1820,9 +1810,6 @@ do {
              if (!scripting) {
                  theApp.Run(kTRUE);
              }
-             else {
-		     c1->SaveAs("fit.pdf");
-	     }
 			 if (ispsf) {
 				 histpsfmat->Delete();
 			 }
@@ -2014,15 +2001,15 @@ do {
 	 }
 	 else if (!strcmp(temp,"error")){
 		 do {
-			 if (!isimg && !isnested){
+			 if (!isimg){
 				 printf("    Image file not yet loaded\n");
 				 break;
 			 }
-			 if (!isexp && !isnested){
+			 if (!isexp){
 				 printf("    Exposure file not yet loaded\n");
 				 break;
 			 }
-			 if (!isprofile && !isnested){
+			 if (!isprofile){
 				 printf("    Profile not yet extracted\n");
 				 break;
 			 }
@@ -2047,120 +2034,95 @@ do {
 				 printf("    Invalid parameter %d\n",par1);
 				 break;
 			 }
-			if (!isnested){
-				 TF1 *ftemp=mkftemp(modname,(char *)"ftemp");;
-				 int modw=model->GetLineWidth();
-				 int modc=model->GetLineColor();
-				 ftemp->SetLineWidth(modw);
-				 ftemp->SetLineColor(modc);
-				 for (int k=0;k<npfunc;k++){
-					 pars=(char *)model->GetParName(k);
-					 ftemp->SetParName(k,pars);
-					 double tpar=model->GetParameter(k);
-					 if (fix[k]){
-						 ftemp->FixParameter(k,tpar);
-					 }
-					 else {
-						 ftemp->SetParameter(k,tpar);
-					 }
-				 }
-				 double *binsh=mkbinsh(nbin,bins,ebins,isr200,r200obs,isr500,r500obs,iskpc,kpcobs);
-				 TH1F *hc=new TH1F("hc","hc",nbin,binsh);
-				 TH1F *hh=new TH1F("hh","hh",nbin,binsh);
-				 for (int i=0;i<nbin;i++){
-					 hc->SetBinContent(i+1,cprof[i]);
-					 hc->SetBinError(i+1,effexp[i]*area[i]);
-					 hh->SetBinContent(i+1,profile[i]);
-					 double toterr=sqrt(eprof[i]*eprof[i]+syserr/100.*profile[i]*syserr/100.*profile[i]);
-					 hh->SetBinError(i+1,toterr);
-				 }
-				 histpsfmat=NULL;
-				 if (ispsf) {
-					 histpsfmat=new TH2F("psf","psf",nbin,0.0,nbin*1.0,nbin,0.0,nbin*1.0);
-					 for (int i=0; i<nbin; i++) {
-						 for (int j=0; j<nbin; j++) {
-							 histpsfmat->SetBinContent(i+1,j+1,psfmat[i*nbin+j]);
-						 }
-					 }
-				 }
-				 if (!islimits){
-					 fitlow=0.0;
-					 fithigh=maxrad;
-				 }
-				 passfitlow=fitlow;
-				 passfithigh=fithigh;
-				 passfmod=ftemp;
-				 if (fitc) {
-					 passhist=hc;
+			 TF1 *ftemp=mkftemp(modname,(char *)"ftemp");;
+			 int modw=model->GetLineWidth();
+			 int modc=model->GetLineColor();
+			 ftemp->SetLineWidth(modw);
+			 ftemp->SetLineColor(modc);
+			 for (int k=0;k<npfunc;k++){
+				 pars=(char *)model->GetParName(k);
+				 ftemp->SetParName(k,pars);
+				 double tpar=model->GetParameter(k);
+				 if (fix[k]){
+					 ftemp->FixParameter(k,tpar);
 				 }
 				 else {
-					 passhist=hh;
+					 ftemp->SetParameter(k,tpar);
 				 }
-				 TFitter* minimizer=new TFitter(npfunc);
-				 double p1 = -1;
-				 minimizer->ExecuteCommand("SET PRINTOUT",&p1,1);
-				 if (!strcmp(statmet,"chi2")&&(!fitc)) {
-					 minimizer->SetFCN(fcnstd);				 
-				 }
-				 else if (!strcmp(statmet,"cash")&&(!fitc)) {
-					 minimizer->SetFCN(fcnstdlikeh);
-				 }
-				 else if (!strcmp(statmet,"chi2")&&(fitc)) {
-					 minimizer->SetFCN(fcncounts);
-				 }
-				 else {
-					 minimizer->SetFCN(fcnlikehcounts);
-				 }
-				 for (int i=0; i<npfunc; i++) {
-					 pars=(char *)ftemp->GetParName(i);
-					 double tpar=ftemp->GetParameter(i);
-					 minimizer->SetParameter(i,pars,tpar,1,0,0);
-					 if (fix[i]) {
-						 minimizer->FixParameter(i);
+			 }
+			 double *binsh=mkbinsh(nbin,bins,ebins,isr200,r200obs,isr500,r500obs,iskpc,kpcobs);
+			 TH1F *hc=new TH1F("hc","hc",nbin,binsh);
+			 TH1F *hh=new TH1F("hh","hh",nbin,binsh);
+			 for (int i=0;i<nbin;i++){
+				 hc->SetBinContent(i+1,cprof[i]);
+				 hc->SetBinError(i+1,effexp[i]*area[i]);
+				 hh->SetBinContent(i+1,profile[i]);
+				 double toterr=sqrt(eprof[i]*eprof[i]+syserr/100.*profile[i]*syserr/100.*profile[i]);
+				 hh->SetBinError(i+1,toterr);
+			 }
+			 histpsfmat=NULL;
+			 if (ispsf) {
+				 histpsfmat=new TH2F("psf","psf",nbin,0.0,nbin*1.0,nbin,0.0,nbin*1.0);
+				 for (int i=0; i<nbin; i++) {
+					 for (int j=0; j<nbin; j++) {
+						 histpsfmat->SetBinContent(i+1,j+1,psfmat[i*nbin+j]);
 					 }
 				 }
-				 minimizer->ExecuteCommand("MIGRAD",0,0);
-				 TMinuit *gm=minimizer->GetMinuit();
-				 double errdef=sqrt(2.)*TMath::ErfInverse(cper/100.);
-				 gm->SetErrorDef(errdef*errdef);
-				 double pp=minimizer->GetParameter(par1-1);
-				 double eplus,eminus,eparab,gcc;
-				 char nn[20];
-				 sprintf(nn,"MINOS 500 %d",par1);
-				 gm->Command(nn);
-				 gm->mnerrs(par1-1,eplus,eminus,eparab,gcc);
-				 printf("    Confidence interval (%g%%) : %g ( %g , %g)\n",cper,pp,eminus,eplus);
-				 if (ispsf) {
-					 histpsfmat->Delete();
+			 }
+			 if (!islimits){
+				 fitlow=0.0;
+				 fithigh=maxrad;
+			 }
+			 passfitlow=fitlow;
+			 passfithigh=fithigh;
+			 passfmod=ftemp;
+			 if (fitc) {
+				 passhist=hc;
+			 }
+			 else {
+				 passhist=hh;
+			 }
+			 TFitter* minimizer=new TFitter(npfunc);
+			 double p1 = -1;
+			 minimizer->ExecuteCommand("SET PRINTOUT",&p1,1);
+			 if (!strcmp(statmet,"chi2")&&(!fitc)) {
+				 minimizer->SetFCN(fcnstd);				 
+			 }
+			 else if (!strcmp(statmet,"cash")&&(!fitc)) {
+				 minimizer->SetFCN(fcnstdlikeh);
+			 }
+			 else if (!strcmp(statmet,"chi2")&&(fitc)) {
+				 minimizer->SetFCN(fcncounts);
+			 }
+			 else {
+				 minimizer->SetFCN(fcnlikehcounts);
+			 }
+			 for (int i=0; i<npfunc; i++) {
+				 pars=(char *)ftemp->GetParName(i);
+				 double tpar=ftemp->GetParameter(i);
+				 minimizer->SetParameter(i,pars,tpar,1,0,0);
+				 if (fix[i]) {
+					 minimizer->FixParameter(i);
 				 }
-				 delete [] binsh;
-				 delete ftemp;
-				 delete hh;
-				 delete hc;
-			}
-			else {
-				if (fix[par1-1]){
-					printf("    Parameter %d is frozen\n",par1);
-					break;
-				}
-				int id[npchain];
-				TMath::Sort(npchain,chains[par1-1],id,0);
-				int ilow=(int)round(npchain*(0.5-cper/100./2.)-1);
-				int ihigh=(int)round(npchain*(0.5+cper/100./2.)-1);
-				double pp,eminus,eplus;
-				if (islogpar[par1-1]){
-					pp=pow(10.,TMath::Median(npchain,chains[par1-1]));
-					eminus=pp-pow(10.,chains[par1-1][id[ilow]]);
-					eplus=pow(10.,chains[par1-1][id[ihigh]])-pp;
-				}
-				else {
-					pp=TMath::Median(npchain,chains[par1-1]);
-					eminus=pp-chains[par1-1][id[ilow]];
-					eplus=chains[par1-1][id[ihigh]]-pp;
-				}
-				printf("    Errors calculated from chains\n");
-				printf("    Confidence interval (%g%%) : %g ( %g , %g)\n",cper,pp,eminus,eplus);
-			}
+			 }
+			 minimizer->ExecuteCommand("MIGRAD",0,0);
+			 TMinuit *gm=minimizer->GetMinuit();
+			 double errdef=sqrt(2.)*TMath::ErfInverse(cper/100.);
+			 gm->SetErrorDef(errdef*errdef);
+			 double pp=minimizer->GetParameter(par1-1);
+			 double eplus,eminus,eparab,gcc;
+			 char nn[20];
+			 sprintf(nn,"MINOS 500 %d",par1);
+			 gm->Command(nn);
+			 gm->mnerrs(par1-1,eplus,eminus,eparab,gcc);
+			 printf("    Confidence interval (%g%%) : %g ( %g , %g)\n",cper,pp,eminus,eplus);
+			 if (ispsf) {
+				 histpsfmat->Delete();
+			 }
+			 delete [] binsh;
+			 delete ftemp;
+			 delete hh;
+			 delete hc;
 		 }while(0);
 		 
 	 }
@@ -3146,151 +3108,151 @@ do {
 			 }
 			 delete [] allprofs;
 			 delete [] allerrs;
-			 delete hh;
+             delete [] hh;
 			 isscat=true;
 			 
 		 }while (0);
 	 }
-      else if (!strcmp(temp,"mediansb")){
-          //Median in sectors
-          do {
-              if (!ismod) {
-                  printf("    No model loaded\n");
-                  break;
-              }
-              double back,eback;
-              int npar=model->GetNpar();
-              char *pname=new char[20];
-              for (int i=0; i<npar; i++) {
-                  pname=(char *)model->GetParName(i);
-                  if (!strcmp(pname,"const")) {
-                      back=model->GetParameter(i);
-                      eback=model->GetParError(i);
-                  }
-              }
-              medprof=NULL;
-              emedprof=NULL;
-              medprof=new double[nbin];
-              emedprof=new double[nbin];
-              if (!isvoronoi){
-                  cout << "    Number of sectors > ";
-                  cin >> temp;
-                  int nsect=atoi(temp);
-                  if (nsect<2) {
-                      printf("    Not enough sectors\n");
-                      break;
-                  }
-                  double angles[nsect+1];
-                  angles[0]=0.0;
-                  for (int i=1; i<nsect+1; i++) {
-                      double ai=2.*TMath::Pi()/nsect*i;
-                      angles[i]=ai;
-                  }
-                  cout << "    Subtract the background? (y/n) > ";
-                  cin >> temp;
-                  double **allprofs=new double*[nsect];
-                  double **allerrs=new double*[nsect];
-                  for (int i=0; i<nsect; i++) {
-                      allprofs[i]=new double[nbin];
-                      allerrs[i]=new double [nbin];
-                  }
-                  for (int i=0; i<nsect; i++) {
-                      double angl=angles[i];
-                      double angh=angles[i+1];
-                      mk_sector_scat(img,exposure,angl,angh,bins,ebins,nbin,allprofs[i],allerrs[i],axes,centroid_ra,centroid_dec,pixsize,maxrad);
-                      if (!strcmp(temp,"y")) {
-                          if (isback) {
-                              double *backsect=new double[nbin];
-                              double *dummyerr=new double[nbin];
-                              mk_sector_scat(backmap,exposure,angl,angh,bins,ebins,nbin,backsect,dummyerr,axes,centroid_ra,centroid_dec,pixsize,maxrad);
-                              for (int nb=0; nb<nbin; nb++) {
-                                  allprofs[i][nb]-=backsect[nb];
-                              }
-                              delete [] backsect;
-                              delete [] dummyerr;
-                          }
-                          backsub(back,eback,nbin,allprofs[i],allerrs[i]);
-                      }
-                  }
-                  for (int i=0; i<nbin; i++) {
-                      int nsectobs=0;
-                      for (int ns=0; ns<nsect; ns++) {
-                          if (allerrs[ns][i]>0.0) {
-                              nsectobs++;
-                          }
-                      }
-                      double *vals=new double[nsectobs];
-                      double *evals=new double[nsectobs];
-                      int is=0;
-                      for (int ns=0; ns<nsect; ns++) {
-                          if (allerrs[ns][i]>0.0) {
-                              vals[is]=allprofs[ns][i];
-                              evals[is]=allerrs[ns][i];
-                              is++;
-                          }
-                      }
-                      medprof[i]=TMath::Median(nsectobs,vals);
-                      emedprof[i]=medianerr(nsectobs,1e3,vals,evals);
-                      delete [] vals;
-                      delete [] evals;
-                      for (int i=0; i<nsect; i++) {
-                          delete [] allprofs[i];
-                          delete [] allerrs[i];
-                      }
-                      delete [] allprofs;
-                      delete [] allerrs;
-                  }
-              }
-              else {
-                  mk_median_prof(voronoimap,voronoierr,medprof,emedprof,bins,ebins,nbin,axes,centroid_ra,centroid_dec,pixsize,maxrad);
-              }
-              double *binsh=mkbinsh(nbin,bins,ebins,isr200,r200obs,isr500,r500obs,iskpc,kpcobs);
-              TH1F *hhmed=new TH1F("median","median",nbin,binsh);
-              for (int i=0;i<nbin;i++){
-                  hhmed->SetBinContent(i+1,medprof[i]);
-                  hhmed->SetBinError(i+1,emedprof[i]);
-              }
-              c1->Clear();
-              if (!logy){
-                  c1->SetLeftMargin(0.15);
-              }
-              else {
-                  c1->SetLeftMargin(0.12);
-              }
-              c1->SetBottomMargin(0.12);
-              hhmed->SetTitle("");
-              hhmed->SetStats(false);
-              hhmed->SetXTitle("Radius [arcmin]");
-              if (isr500) {
-                  hhmed->SetXTitle("r/r_{500}");
-              }
-              if (isr200) {
-                  hhmed->SetXTitle("r/r_{200}");
-              }
-              if (iskpc) {
-                  hhmed->SetXTitle("Radius [kpc]");
-              }
-              if (!logy){
-                  hhmed->GetYaxis()->SetTitleOffset(1.8);
-              }
-              else {
-                  hhmed->GetYaxis()->SetTitleOffset(1.5);
-              }
-              hhmed->GetXaxis()->SetTitleOffset(1.2);
-              hhmed->GetXaxis()->CenterTitle();
-              hhmed->GetYaxis()->CenterTitle();
-              hhmed->SetYTitle("SB [counts s^{-1} arcmin^{-2}]");
-              hhmed->Draw();
-              c1->Update();
-              ismed=true;
-              if (!scripting) {
-                  theApp.Run(kTRUE);
-              }
-              delete [] binsh;
-              delete hhmed;
-          }
-          while (0);
-      }
+     else if (!strcmp(temp,"mediansb")){
+         //Median in sectors
+		 do {
+			 if (!ismod) {
+				 printf("    No model loaded\n");
+				 break;
+			 }
+			 double back,eback;
+			 int npar=model->GetNpar();
+			 char *pname=new char[20];
+			 for (int i=0; i<npar; i++) {
+				 pname=(char *)model->GetParName(i);
+				 if (!strcmp(pname,"const")) {
+					 back=model->GetParameter(i);
+					 eback=model->GetParError(i);
+				 }
+			 }
+             medprof=NULL;
+             emedprof=NULL;
+             medprof=new double[nbin];
+             emedprof=new double[nbin];
+             if (!isvoronoi){
+                 cout << "    Number of sectors > ";
+                 cin >> temp;
+                 int nsect=atoi(temp);
+                 if (nsect<2) {
+                     printf("    Not enough sectors\n");
+                     break;
+                 }
+                 double angles[nsect+1];
+                 angles[0]=0.0;
+                 for (int i=1; i<nsect+1; i++) {
+                     double ai=2.*TMath::Pi()/nsect*i;
+                     angles[i]=ai;
+                 }
+                 cout << "    Subtract the background? (y/n) > ";
+                 cin >> temp;
+                 double **allprofs=new double*[nsect];
+                 double **allerrs=new double*[nsect];
+                 for (int i=0; i<nsect; i++) {
+                     allprofs[i]=new double[nbin];
+                     allerrs[i]=new double [nbin];
+                 }
+                 for (int i=0; i<nsect; i++) {
+                     double angl=angles[i];
+                     double angh=angles[i+1];
+                     mk_sector_scat(img,exposure,angl,angh,bins,ebins,nbin,allprofs[i],allerrs[i],axes,centroid_ra,centroid_dec,pixsize,maxrad);
+                     if (!strcmp(temp,"y")) {
+                         if (isback) {
+                             double *backsect=new double[nbin];
+                             double *dummyerr=new double[nbin];
+                             mk_sector_scat(backmap,exposure,angl,angh,bins,ebins,nbin,backsect,dummyerr,axes,centroid_ra,centroid_dec,pixsize,maxrad);
+                             for (int nb=0; nb<nbin; nb++) {
+                                 allprofs[i][nb]-=backsect[nb];
+                             }
+                             delete [] backsect;
+                             delete [] dummyerr;
+                         }
+                         backsub(back,eback,nbin,allprofs[i],allerrs[i]);
+                     }
+                 }
+                 for (int i=0; i<nbin; i++) {
+                     int nsectobs=0;
+                     for (int ns=0; ns<nsect; ns++) {
+                         if (allerrs[ns][i]>0.0) {
+                             nsectobs++;
+                         }
+                     }
+                     double *vals=new double[nsectobs];
+                     double *evals=new double[nsectobs];
+                     int is=0;
+                     for (int ns=0; ns<nsect; ns++) {
+                         if (allerrs[ns][i]>0.0) {
+                             vals[is]=allprofs[ns][i];
+                             evals[is]=allerrs[ns][i];
+                             is++;
+                         }
+                     }
+                     medprof[i]=TMath::Median(nsectobs,vals);
+                     emedprof[i]=medianerr(nsectobs,1e3,vals,evals);
+                     delete [] vals;
+                     delete [] evals;
+                     for (int i=0; i<nsect; i++) {
+                         delete [] allprofs[i];
+                         delete [] allerrs[i];
+                     }
+                     delete [] allprofs;
+                     delete [] allerrs;
+                 }
+             }
+             else {
+                 mk_median_prof(voronoimap,voronoierr,medprof,emedprof,bins,ebins,nbin,axes,centroid_ra,centroid_dec,pixsize,maxrad);
+             }
+			 double *binsh=mkbinsh(nbin,bins,ebins,isr200,r200obs,isr500,r500obs,iskpc,kpcobs);
+             TH1F *hhmed=new TH1F("median","median",nbin,binsh);
+             for (int i=0;i<nbin;i++){
+                 hhmed->SetBinContent(i+1,medprof[i]);
+                 hhmed->SetBinError(i+1,emedprof[i]);
+             }
+             c1->Clear();
+             if (!logy){
+                 c1->SetLeftMargin(0.15);
+             }
+             else {
+                 c1->SetLeftMargin(0.12);
+             }
+             c1->SetBottomMargin(0.12);
+             hhmed->SetTitle("");
+             hhmed->SetStats(false);
+             hhmed->SetXTitle("Radius [arcmin]");
+             if (isr500) {
+                 hhmed->SetXTitle("r/r_{500}");
+             }
+             if (isr200) {
+                 hhmed->SetXTitle("r/r_{200}");
+             }
+             if (iskpc) {
+                 hhmed->SetXTitle("Radius [kpc]");
+             }
+             if (!logy){
+                 hhmed->GetYaxis()->SetTitleOffset(1.8);
+             }
+             else {
+                 hhmed->GetYaxis()->SetTitleOffset(1.5);
+             }
+             hhmed->GetXaxis()->SetTitleOffset(1.2);
+             hhmed->GetXaxis()->CenterTitle();
+             hhmed->GetYaxis()->CenterTitle();
+             hhmed->SetYTitle("SB [counts s^{-1} arcmin^{-2}]");
+             hhmed->Draw();
+             c1->Update();
+             ismed=true;
+             if (!scripting) {
+                 theApp.Run(kTRUE);
+             }
+             delete [] binsh;
+             delete hhmed;
+         }
+         while (0);
+     }
 	 /*else if (!strcmp(temp,"deviations")){
 		 do {
 			 if (!isprofile){
@@ -3437,32 +3399,10 @@ do {
              if (ismod) {
                  model->Draw("same");
              }
-			 if (isnested){
-				TF1 *ftemp=mkftemp(modname,(char *)"ftemp");
-				for (int k=0;k<model->GetNpar();k++){
-					double tpar=model->GetParameter(k);
-					ftemp->SetParameter(k,tpar);
-				}
-				double *vnest=new double[nbin];
-				double *evnest=new double[nbin];
-				calc_envelope(chains,npchain,ftemp,bins,nbin,fix,islogpar,vnest,evnest);
-				double *zer=new double[nbin];
-				for (int i=0;i<nbin;i++){
-					zer[i]=0.0;
-					//printf("bins, vnest, evnest: %g  %g  %g\n",bins[i],vnest[i],evnest[i]);
-				}
-				TGraphErrors *gnest=new TGraphErrors(nbin,bins,vnest,zer,evnest);
-				gnest->SetFillColor(2);
-				gnest->Draw("3");
-				ftemp->Delete();
-			 }
 			 c1->Update();
              if (!scripting) {
                  theApp.Run(kTRUE);
              }
-             else {
-		     c1->SaveAs("plot.pdf");
-	     }
              delete [] binsh;
 			 delete hh;
 			 delete hback;
@@ -3500,9 +3440,6 @@ do {
              if (!scripting) {
                  theApp.Run(kTRUE);
              }
-             else {
-		     c1->SaveAs("plotcounts.pdf");
-	     }
 		 }while(0);
 	 }
 	 else if (!strcmp(temp,"plotgrowth")){
@@ -3532,9 +3469,6 @@ do {
              if (!scripting) {
                  theApp.Run(kTRUE);
              }
-             else {
-		     c1->SaveAs("plotgrowth.pdf");
-	     }
 		 }while(0);
 	 }
 	 else if (!strcmp(temp,"plotgrmod")){
@@ -4039,7 +3973,7 @@ do {
 				psfmat=NULL;
 				psfmat=new double[nbin*nbin];
 				psfgaussnew(nphot,bins,ebins,exposure,nbin,axes,centroid_ra,centroid_dec,sigpsf,pixsize,psfmat);
-				ispsf=true;				
+				ispsf=true;
 			}
 			else if (!strcmp(temp,"king")){
 				cout << "    Number of ray-tracing photons per bin > ";
@@ -4068,6 +4002,7 @@ do {
 				psfmat=NULL;
 				psfmat=new double[nbin*nbin];
 				psfkingnew(nphot,bins,ebins,exposure,nbin,axes,centroid_ra,centroid_dec,r0,alpha,pixsize,psfmat);
+                //psfkingan(bins,area,nbin,r0,alpha,psfmat);
 				ispsf=true;				
 			}
 			else {
@@ -4366,7 +4301,7 @@ do {
                   backmap=NULL;
                   backmap=new double[axes[0]*axes[1]];
                   backprof=NULL;
-                  backprof=new double[nbin];
+                  backcounts=NULL;
                   backprof=new double[nbin];
                   backcounts=new double[nbin];
               }
@@ -4981,383 +4916,6 @@ do {
         }
         while (0);
     }
-     else if (!strcmp(temp,"multinest")){
-		 do {
-			 if (!isimg){
-				 printf("    Image file not yet loaded\n");
-				 break;
-			 }
-			 if (!isexp){
-				 printf("    Exposure file not yet loaded\n");
-				 break;
-			 }
-			 if (!isprofile){
-				 printf("    Profile not yet extracted\n");
-				 break;
-			 }
-			 if (!ismod){
-				 printf("    No model loaded\n");
-				 break;
-			 }
-			 char *parname=new char[200];
-			 int npfunc=model->GetNpar();
-			 int npfit=0;
-			 for (int i=0;i<npfunc;i++){
-				if (!fix[i]){
-					npfit++;
-				}
-			 }
-             printf("npfit: %d\n",npfit);
-			 cout << "    Name of MultiNest output files > ";
-			 cin >> nestname;
-			 double *boundlow=new double[npfit];
-			 double *boundhigh=new double[npfit];
-			 islogpar=new bool[npfit];
-			 TF1 *ftemp=mkftemp(modname,(char *)"ftemp");
-			 int tp=0;
-			 sprintf(temp,"%s_params.txt",nestname);
-			 FILE *saveparams=fopen(temp,"w");
-			 for (int k=0;k<npfunc;k++){
-				 parname=(char *)model->GetParName(k);
-				 ftemp->SetParName(k,parname);
-				 double tpar=model->GetParameter(k);
-				 if (fix[k]){
-					 ftemp->FixParameter(k,tpar);
-					 printf("    Parameter %d is frozen\n",k+1);
-				 }
-				 else {
-					 ftemp->SetParameter(k,tpar);
-					 islogpar[tp]=false;
-					 cout << "    Set log prior on parameter " << k+1 << "? (y/n; default=n) > ";
-					 cin >> temp;
-					 if (!strcmp(temp,"y")||!strcmp(temp,"Y")||!strcmp(temp,"yes")){
-						islogpar[tp]=true;
-					 }
-					 cout << "    Set lower and upper boundaries for parameter " << k+1 << " > ";
-					 cin >> temp;
-					 boundlow[tp]=atof(temp);
-					 cin >> temp;
-					 boundhigh[tp]=atof(temp);
-					 if (islogpar[tp]){
-					 	fprintf(saveparams,"%d %g log %g %g\n",k+1,tpar,boundlow[tp],boundhigh[tp]);
-						boundlow[tp]=log10(boundlow[tp]);
-						boundhigh[tp]=log10(boundhigh[tp]);
-					 }
-					 else {
-					 	fprintf(saveparams,"%d %g flat %g %g\n",k+1,tpar,boundlow[tp],boundhigh[tp]);
-					 }
-					 tp++;
-				 }
-			 }
-			 fclose(saveparams);
-			 double *binsh=mkbinsh(nbin,bins,ebins,isr200,r200obs,isr500,r500obs,iskpc,kpcobs);
-			 TH1F *hc=new TH1F("hc","hc",nbin,binsh);
-			 for (int i=0;i<nbin;i++){
-				 hc->SetBinContent(i+1,cprof[i]);
-				 hc->SetBinError(i+1,effexp[i]*area[i]);
-			 }
-			 histpsfmat=NULL;
-			 if (ispsf) {
-				 histpsfmat=new TH2F("psf","psf",nbin,0.0,nbin*1.0,nbin,0.0,nbin*1.0);
-				 for (int i=0; i<nbin; i++) {
-					 for (int j=0; j<nbin; j++) {
-						 histpsfmat->SetBinContent(i+1,j+1,psfmat[i*nbin+j]);
-					 }
-				 }
-			 }
-			 if (!islimits){
-				 fitlow=0.0;
-				 fithigh=maxrad;
-			 }
-			 passfitlow=fitlow;
-			 passfithigh=fithigh;
-			 passfmod=ftemp;
-			 passhist=hc;
-			 passbck=backcounts;
-			sprintf(temp,"%s_params.txt",nestname);
-			FILE *fparams=fopen(temp,"r");
-			for (int k=0;k<npfit;k++){
-				int tp;
-				double vp,blp,bhp;
-				fscanf(fparams,"%d %lf %s %lf %lf\n",&tp,&vp,temp,&blp,&bhp);
-				if (!strcmp(temp,"log")){
-					islogpar[tp-1]=true;
-				}
-				else {
-					islogpar[tp-1]=false;
-				}
-			}
-			 run_multinest(ftemp,boundlow,boundhigh,fix,islogpar,statmet,nestname);
-			 chains=NULL;
-			 chains=new double*[npfunc];
-			 load_chains(nestname,npfunc,fix,npchain,chains);
-			 if (ispsf) {
-				 histpsfmat->Delete();
-			 }
-			 ftemp->Delete();
-			 hc->Delete();
-			 delete [] boundlow;
-			 delete [] boundhigh;
-			isnested=true;
-		 }while(0);
-     }
-	else if (!strcmp(temp,"loadchains")){
-		do{
-		if (!ismod){
-			printf("    No model loaded\n");
-			break;
-		}
-		cout << "    Name of MultiNest output files > ";
-		cin >> nestname;
-		sprintf(temp,"%s_params.txt",nestname);
-		int npfit=line_num(temp);
-		FILE *fparams=fopen(temp,"r");
-		int npfunc=model->GetNpar();
-		islogpar=new bool[npfit];
-		for (int k=0;k<npfit;k++){
-			int tp;
-			double vp,blp,bhp;
-			fscanf(fparams,"%d %lf %s %lf %lf\n",&tp,&vp,temp,&blp,&bhp);
-			if (!strcmp(temp,"log")){
-				islogpar[tp-1]=true;
-			}
-			else {
-				islogpar[tp-1]=false;
-			}
-		}
-		chains=NULL;
-		chains=new double*[npfunc];
-		load_chains(nestname,npfunc,fix,npchain,chains);
-		if (npchain>0){
-			isnested=true;			
-		}
-		}while(0);
-	}
-	else if (!strcmp(temp,"margin")){
-		do {
-			if (!isnested){
-				printf("    No active chains\n");
-				break;
-			}
-			 if (!ismod){
-				 printf("    No model loaded\n");
-				 break;
-			 }
-			int nbpost=100;
-			int nb2d=20;
-			int npfit=0;
-			int npfunc=model->GetNpar();
-			for (int i=0;i<npfunc;i++){
-				if (!fix[i]) npfit++;
-			}
-			c1->Clear();
-			c1->SetTickx();
-			c1->SetTicky();
-			c1->Divide(npfit,npfit);
-			TF1 *fdiv=new TF1("fdiv","[0]",0.,1e3);
-			fdiv->SetParameter(0,npchain);
-			int npad=1;
-			char *parnam=new char[200];
-			for (int i=0;i<npfunc;i++){
-				for (int j=0;j<npfunc;j++){
-					if (!fix[i]&&!fix[j]){
-						c1->cd(npad);
-						gPad->SetTickx();
-						gPad->SetTicky();
-						gPad->SetLeftMargin(0.15);
-						gPad->SetBottomMargin(0.15);
-						gPad->SetTopMargin(0.05);
-						gPad->SetRightMargin(0.05);
-						if (i==j){
-							double minval=TMath::MinElement(npchain,chains[i]);
-							double maxval=TMath::MaxElement(npchain,chains[i]);
-							TH1F *hpost;
-							sprintf(temp,"post%d",i);
-							if (islogpar[i]){
-								hpost=new TH1F(temp,"",nbpost,pow(10.,minval),pow(10.,maxval));
-							}
-							else {
-								hpost=new TH1F(temp,"",nbpost,minval,maxval);
-							}
-							for (int np=0;np<npchain;np++){
-								if (islogpar[i]){
-									hpost->Fill(pow(10.,chains[i][np]));
-									gPad->SetLogx();
-								}
-								else {
-									hpost->Fill(chains[i][np]);
-									gPad->SetLogx(0);
-								}
-							}
-							hpost->Divide(fdiv);
-							parnam=(char *)model->GetParName(i);
-							hpost->SetXTitle(parnam);
-							//hpost->SetYTitle("Probability");
-							hpost->GetXaxis()->SetTitleOffset(1.2);
-							hpost->GetXaxis()->SetLabelSize(0.06);
-		      			  	hpost->GetXaxis()->CenterTitle();
-							hpost->GetXaxis()->SetTitleSize(0.06);
-							hpost->GetYaxis()->SetTitleOffset(2.0);
-							hpost->GetYaxis()->SetLabelSize(0.06);
-		     			   	hpost->GetYaxis()->CenterTitle();
-							hpost->GetYaxis()->SetTitleSize(0.06);
-							hpost->SetStats(0);
-							hpost->SetFillColor(kCyan);
-							hpost->Draw();
-						}
-						else if (i<j){
-							
-							double minvx=TMath::MinElement(npchain,chains[i]);
-							double maxvx=TMath::MaxElement(npchain,chains[i]);
-							double minvy=TMath::MinElement(npchain,chains[j]);
-							double maxvy=TMath::MaxElement(npchain,chains[j]);
-							TH2F *hxy;
-							sprintf(temp,"hxy%d%d",i,j);
-							if (islogpar[i]&&islogpar[j]){
-								hxy=new TH2F(temp,"",nb2d,pow(10.,minvx),pow(10.,maxvx),nb2d,pow(10.,minvy),pow(10.,maxvy));
-							}
-							else if (islogpar[i]&&!islogpar[j]){
-								hxy=new TH2F(temp,"",nb2d,pow(10.,minvx),pow(10.,maxvx),nb2d,minvy,maxvy);
-							}
-							else if (!islogpar[i]&&islogpar[j]){
-								hxy=new TH2F(temp,"",nb2d,minvx,maxvx,nb2d,pow(10.,minvy),pow(10.,maxvy));
-							}
-							else {
-								hxy=new TH2F(temp,"",nb2d,minvx,maxvx,nb2d,minvy,maxvy);
-							}
-							for (int np=0;np<npchain;np++){
-								double vx,vy;
-								if (islogpar[i]){
-									vx=pow(10.,chains[i][np]);
-									gPad->SetLogx();
-								}
-								else {
-									vx=chains[i][np];
-									gPad->SetLogx(0);
-								}
-								if (islogpar[j]){
-									vy=pow(10.,chains[j][np]);
-									gPad->SetLogy();
-								}
-								else {
-									vy=chains[j][np];
-									gPad->SetLogy(0);
-								}
-								hxy->Fill(vx,vy);
-							}
-							
-							hxy->Divide(fdiv);
-							hxy->SetStats(0);
-							parnam=(char *)model->GetParName(i);
-							hxy->SetXTitle(parnam);
-							parnam=(char *)model->GetParName(j);
-							hxy->SetYTitle(parnam);
-							hxy->GetXaxis()->SetTitleOffset(1.2);
-							hxy->GetXaxis()->SetTitleSize(0.06);
-							hxy->GetXaxis()->SetLabelSize(0.06);
-		      			  	hxy->GetXaxis()->CenterTitle();
-							hxy->GetYaxis()->SetTitleOffset(1.2);
-							hxy->GetYaxis()->SetLabelSize(0.06);
-							hxy->GetYaxis()->SetTitleSize(0.06);
-		     			   	hxy->GetYaxis()->CenterTitle();
-							hxy->Draw("cont0");
-						}
-						npad++;
-					}
-				}
-			}
-			c1->cd();		
-			c1->Update();
-        	if (!scripting) {
-			theApp.Run(kTRUE);
-        	}
-        	else {
-			sprintf(temp,"%s_margin.pdf",nestname);
-			c1->SaveAs(temp);
-		}
-			fdiv->Delete();
-		}while(0);
-	}
-	else if (!strcmp(temp,"posterior")){
-		do {
-			if (!isnested){
-				printf("    No active chains\n");
-				break;
-			}
-			if (!ismod){
-				printf("    No model loaded\n");
-				break;
-			}
-       		cout << "    Parameter > ";
-        	cin >> temp;
-			int par=atoi(temp)-1;
-			int npfunc=model->GetNpar();
-			if (par<0||par>npfunc){
-				printf("   Invalid parameter %s\n",temp);
-				break;
-			}
-			if (fix[par]){
-				printf("    Parameter %d is frozen\n",par+1);
-				break;
-			}
-      		cout << "    Number of bins in output histogram > ";
-        	cin >> temp;
-			int nbpost=atoi(temp);
-			if (nbpost<1){
-				printf("    Invalid number of bins %s\n",temp);
-				break;
-			}
-			int npfit=0;
-			for (int i=0;i<npfunc;i++){
-				if (!fix[i]) npfit++;
-			}
-			c1->Clear();
-			c1->SetTickx();
-			c1->SetTicky();
-			TF1 *fdiv=new TF1("fdiv","[0]",0.,1e3);
-			fdiv->SetParameter(0,npchain);
-			char *parnam=new char[200];
-			double minval=TMath::MinElement(npchain,chains[par]);
-			double maxval=TMath::MaxElement(npchain,chains[par]);
-			TH1F *hpost;
-			if (islogpar[par]){
-				hpost=new TH1F("post","",nbpost,pow(10.,minval),pow(10.,maxval));
-			}
-			else {
-				hpost=new TH1F("post","",nbpost,minval,maxval);
-			}
-			for (int np=0;np<npchain;np++){
-				if (islogpar[par]){
-					hpost->Fill(pow(10.,chains[par][np]));
-					c1->SetLogx();
-				}
-				else {
-					hpost->Fill(chains[par][np]);
-					c1->SetLogx(0);
-				}
-			}
-			hpost->Divide(fdiv);
-			parnam=(char *)model->GetParName(par);
-			hpost->SetXTitle(parnam);
-			hpost->SetYTitle("Probability");
-			hpost->GetXaxis()->SetTitleOffset(1.2);
- 			hpost->GetXaxis()->CenterTitle();
-			hpost->GetYaxis()->SetTitleOffset(1.2);
-		    hpost->GetYaxis()->CenterTitle();
-			hpost->SetStats(0);
-			hpost->Draw();
-			c1->Update();
-        	if (!scripting) {
-            	theApp.Run(kTRUE);
-        	}
-		else {
-			sprintf(temp,"%s_posterior.pdf",nestname);
-			c1->SaveAs(temp);
-		}
-			fdiv->Delete();
-			hpost->Delete();
-		}while(0);
-	}
     else {
        printf("   Unknown command %s\n",temp);
        printf("   For a list of commands type help\n");
@@ -5372,15 +4930,8 @@ do {
   delete [] ebins;
   delete [] eprof;
   delete [] ecp;
-	if (isnested){
-		int npmod=model->GetNpar();
-		for (int i=0;i<npmod;i++){
-			delete [] chains[i];
-		}
-		delete [] chains;
-	}
   delete model;
- // c1->Delete();
+//delete c1;
   for (int i=0;i<20;i++){
     delete [] names[i];
   }
@@ -5389,7 +4940,7 @@ do {
   delete [] egr;
   delete [] axes;
 	delete [] backprof;
-	delete [] wcs_inp;
+	delete wcs_inp;
 	delete [] deprof;
 	delete [] edeprof;
 	delete [] scat;
@@ -5397,8 +4948,6 @@ do {
 	delete [] effexp;
     delete [] medprof;
     delete [] emedprof;
-	delete [] fix;
-	delete [] islogpar;
 }
 while (0);
 }

@@ -558,7 +558,7 @@ int load_fits_structure(char *infile,int &nbin,long *axes,bool &isback,bool &isp
     return 0;
 }
 
-int load_fits(char *infile,int nbin,long *axes,double *bins,double *ebins,double *profile,double *eprof,double *cprof,double *area,double *effexp,bool &isprofile,char *imgfile,char *expfile,double *img,bool &isimg,double *exposure,bool &isexp,double &centroid_ra,double &centroid_dec,double &pixsize,double &cdelt1,double &crval1,double &crval2,double &crpix1,double &crpix2,struct  wcsprm *wcs_inp,char *backfile,double *backmap,bool isback,double *backprof,double *backcounts,char **names,TF1 *model,double *psfmat){
+int load_fits(char *infile,int nbin,long *axes,double *bins,double *ebins,double *profile,double *eprof,double *cprof,double *area,double *effexp,bool &isprofile,char *imgfile,char *expfile,double *img,bool &isimg,double *exposure,bool &isexp,double &centroid_ra,double &centroid_dec,double &pixsize,double &cdelt1,double &crval1,double &crval2,double &crpix1,double &crpix2,struct  wcsprm *wcs_inp,char *backfile,double *backmap,bool &isback,double *backprof,double *backcounts,char **names,TF1 *model,double *psfmat){
     fitsfile *x;
     int status=0;
     fits_open_file(&x,infile,READONLY,&status);
@@ -596,37 +596,32 @@ int load_fits(char *infile,int nbin,long *axes,double *bins,double *ebins,double
                 printf("Error: EXPFILE keyword could not be read\n");
                 return status;
             }
-            if (!strcmp(expfile,"none")){
-                for (int i=0;i<axes[0]*axes[1];i++){
-                    exposure[i]=1.0;
-                }
+            status=readexp(expfile,axes,exposure);
+            if (status!=0){
+                printf("    Error: exposure map could not be read\n");
+                printf("    Error %d\n",status);
+                return status;
             }
             else {
-                status=readexp(expfile,axes,exposure);
+                printf("    Exposure map successfully loaded\n");
+                isexp=true;
+            }
+            fits_read_key(x,TSTRING,(char *)"BACKFILE",backfile,NULL,&status);
+            if (status==0){
+                status=readback(backfile,axes,backmap);
                 if (status!=0){
-                    printf("    Error: exposure map could not be read\n");
+                    printf("    Error: background map could not be read\n");
                     printf("    Error %d\n",status);
                     return status;
                 }
                 else {
-                    printf("    Exposure map successfully loaded\n");
-                    isexp=true;
+                    printf("    Background map successfully loaded\n");
+                    isback=true;
                 }
             }
-            if (isback){
-                fits_read_key(x,TSTRING,(char *)"BACKFILE",backfile,NULL,&status);
-                if (status==0){
-                    status=readback(backfile,axes,backmap);
-                    if (status!=0){
-                        printf("    Error: background map could not be read\n");
-                        printf("    Error %d\n",status);
-                        return status;
-                    }
-                    else {
-                        printf("    Background map successfully loaded\n");
-                        isback=true;
-                    }
-                }
+            else {
+                isback=false;
+                status=0;
             }
             double xc,yc;
             fits_read_key(x,TDOUBLE,(char *)"X_C",&xc,NULL,&status);
